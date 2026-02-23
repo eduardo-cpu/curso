@@ -1,31 +1,28 @@
 # Dependencies
 node_modules/
 venv/
+.venv/
 env/
-__pycache__/
 
 # Build outputs
 dist/
 build/
-*.o
-*.a
-*.so
+*.egg-info/
 
-# IDE and editor files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
 
-# Environment variables
-.env
-.env.local
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
 npm-debug.log*
 
-# OS files
-Thumbs.db
+# Environment variables
+.env
+.env.local
