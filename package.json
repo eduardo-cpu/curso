@@ -33,7 +33,7 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^13.5.11",
+    "eslint-config-next": "^13.13.1.6.11",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jest": "^28.6.0",
     "jest": "^30.2.0",
