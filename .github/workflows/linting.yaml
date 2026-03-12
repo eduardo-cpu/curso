@@ -7,11 +7,11 @@ jobs:
     name: Prettier
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "lts/hydrogen"
+          node-version: "lts/jod"
 
       - run: npm ci
 
@@ -20,11 +20,11 @@ jobs:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "lts/hydrogen"
+          node-version: "lts/jod"
 
       - run: npm ci
 
@@ -34,13 +34,13 @@ jobs:
     name: commitlint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "lts/hydrogen"
+          node-version: "lts/jod"
 
       - run: npm ci
 
