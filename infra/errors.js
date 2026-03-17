@@ -54,3 +54,43 @@ export class ServiceError extends Error {
     };
   }
 }
+
+export class ValidationError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Dados inválidos.", {
+      cause,
+    });
+    this.name = "ValidationError";
+    this.action = action || "Verifique se os dados fornecidos são válidos.";
+    this.statusCode = 400;
+  }
+
+  errorToJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
+
+export class NotFoundError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Usuário não encontrado.", {
+      cause,
+    });
+    this.name = "NotFoundError";
+    this.action = action || "Verifique se os dados fornecidos são válidos.";
+    this.statusCode = 404;
+  }
+
+  errorToJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.statusCode,
+    };
+  }
+}
