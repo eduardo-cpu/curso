@@ -18,8 +18,6 @@ module.exports = async () => {
   const jestConfig = await createJestConfig(customJestConfig)();
   return {
     ...jestConfig,
-    transformIgnorePatterns: [
-      "/node_modules/(?!(node-pg-migrate)/)"
-    ],
+    transformIgnorePatterns: ["/node_modules/(?!(node-pg-migrate)/)"],
   };
 };
