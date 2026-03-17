@@ -9,9 +9,17 @@ const createJestConfig = nextJest({
   dir: "./",
 });
 
-const jestConfig = createJestConfig({
+const customJestConfig = {
   moduleDirectories: ["node_modules", "<rootDir>/"],
   testTimeout: 60000,
-});
+};
 
-module.exports = jestConfig;
+module.exports = async () => {
+  const jestConfig = await createJestConfig(customJestConfig)();
+  return {
+    ...jestConfig,
+    transformIgnorePatterns: [
+      "/node_modules/(?!(node-pg-migrate)/)"
+    ],
+  };
+};
