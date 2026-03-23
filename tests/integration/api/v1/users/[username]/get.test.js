@@ -1,8 +1,5 @@
 import { version as uuidVersion } from "uuid";
-import { describe } from "node:test";
 import orchestrator from "tests/orchestrator.js";
-import { stat } from "fs";
-import { create } from "domain";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -11,9 +8,9 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/users/[username]", () => {
-  describe("Anonymous User", () => {
+  describe("Anonymous user", () => {
     test("With exact case match", async () => {
-      await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "MesmoCase",
       });
 
@@ -39,13 +36,13 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With  case mismatch", async () => {
-      await orchestrator.createUser({
+    test("With case mismatch", async () => {
+      const createdUser = await orchestrator.createUser({
         username: "CaseDiferente",
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/caseDiferente",
+        "http://localhost:3000/api/v1/users/casediferente",
       );
 
       expect(response.status).toBe(200);
@@ -65,7 +62,8 @@ describe("GET /api/v1/users/[username]", () => {
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
-    test("With   nonexistent username", async () => {
+
+    test("With nonexistent username", async () => {
       const response = await fetch(
         "http://localhost:3000/api/v1/users/UsuarioInexistente",
       );
