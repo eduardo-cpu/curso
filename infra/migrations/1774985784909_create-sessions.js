@@ -1,7 +1,3 @@
-const { notDeepEqual } = require("assert");
-const { unique } = require("next/dist/build/utils");
-const { type } = require("os");
-
 exports.up = (pgm) => {
   pgm.createTable("sessions", {
     id: {
