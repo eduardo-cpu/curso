@@ -27,6 +27,9 @@ describe("GET /api/v1/user", () => {
 
       expect(response.status).toBe(200);
 
+      const cacheControl = response.headers.get("Cache-Control");
+      expect(cacheControl).toBe("no-store, max-age=0, must-revalidate");
+
       const responseBody = await response.json();
 
       expect(responseBody).toEqual({
@@ -41,7 +44,38 @@ describe("GET /api/v1/user", () => {
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      // Session renewal assertions
+      const renewedSessionObject = await session.findOneValidByToken(
+        sessionObject.token,
+      );
+
+      expect(
+        renewedSessionObject.expires_at > sessionObject.expires_at,
+      ).toEqual(true);
+      expect(
+        renewedSessionObject.updated_at > sessionObject.updated_at,
+      ).toEqual(true);
+
+      // Set-Cookie assertions
+      const expiresAt = new Date(renewedSessionObject.expires_at);
+      const createdAt = new Date(renewedSessionObject.created_at);
+      expiresAt.setMilliseconds(0);
+      createdAt.setMilliseconds(0);
+      expect(expiresAt - createdAt).toBe(session.EXPIRATION_IN_MILLISECONDS);
+
+      const parsedSetCookie = setCookieParser(response, {
+        map: true,
+      });
+      expect(parsedSetCookie.session_id).toEqual({
+        name: "session_id",
+        value: sessionObject.token,
+        maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
+        path: "/",
+        httpOnly: true,
+      });
     });
+
     test("With nonexistent session", async () => {
       const nonexistentToken =
         "f0b62a5ff97ae607701ceeee2e3c4987c4b9debb534410e2444f9eb2288b6e3b90158a71d086e31eabef9b36cbb549e1";
