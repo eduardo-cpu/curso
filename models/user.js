@@ -4,7 +4,6 @@ import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function findOneById(id) {
   const userFound = await runSelectQuery(id);
-
   return userFound;
 
   async function runSelectQuery(id) {
@@ -35,7 +34,6 @@ async function findOneById(id) {
 
 async function findOneByUsername(username) {
   const userFound = await runSelectQuery(username);
-
   return userFound;
 
   async function runSelectQuery(username) {
@@ -66,7 +64,6 @@ async function findOneByUsername(username) {
 
 async function findOneByEmail(email) {
   const userFound = await runSelectQuery(email);
-
   return userFound;
 
   async function runSelectQuery(email) {
@@ -95,31 +92,63 @@ async function findOneByEmail(email) {
   }
 }
 
+function injectDefaultFeaturesInObject(userInputValues) {
+  userInputValues.features = ["read:activation_token"];
+}
+
+async function runInsertQuery(userInputValues) {
+  const results = await database.query({
+    text: `
+    INSERT INTO 
+      users (username, email, password, features) 
+    VALUES
+     ($1, $2, $3, $4)
+     RETURNING *
+     ;`,
+    values: [
+      userInputValues.username,
+      userInputValues.email,
+      userInputValues.password,
+      userInputValues.features,
+    ],
+  });
+  return results.rows[0];
+}
+
 async function create(userInputValues) {
   await validatedUniqueEmail(userInputValues.email);
   await validatedUniqueUsername(userInputValues.username);
   await hashPasswordInObject(userInputValues);
+  injectDefaultFeaturesInObject(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
+}
 
-  async function runInsertQuery(userInputValues) {
-    const results = await database.query({
-      text: `
-    INSERT INTO 
-      users (username, email, password) 
-    VALUES
-     ($1, $2, $3)
-     RETURNING *
-     ;`,
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
-    });
-    return results.rows[0];
-  }
+async function runUpdateQuery(userWithNewValues) {
+  const results = await database.query({
+    text: `
+    UPDATE
+      users
+    SET
+      username = $2,
+      email = $3,
+      password = $4,
+      updated_at = timezone('utc', now())
+    WHERE
+      id = $1
+    RETURNING 
+      *
+      `,
+    values: [
+      userWithNewValues.id,
+      userWithNewValues.username,
+      userWithNewValues.email,
+      userWithNewValues.password,
+    ],
+  });
+
+  return results.rows[0];
 }
 
 async function update(username, userInputValues) {
@@ -141,32 +170,6 @@ async function update(username, userInputValues) {
 
   const updatedUser = await runUpdateQuery(userWithNewValues);
   return updatedUser;
-
-  async function runUpdateQuery(userWithNewValues) {
-    const results = await database.query({
-      text: `
-    UPDATE
-      users
-    SET
-      username = $2,
-      email = $3,
-      password = $4,
-      updated_at = timezone('utc', now())
-    WHERE
-      id = $1
-    RETURNING 
-      *
-      `,
-      values: [
-        userWithNewValues.id,
-        userWithNewValues.username,
-        userWithNewValues.email,
-        userWithNewValues.password,
-      ],
-    });
-
-    return results.rows[0];
-  }
 }
 
 async function validatedUniqueUsername(username) {
